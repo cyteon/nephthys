@@ -13,7 +13,7 @@ class Nest(Transcript):
 
     faq_link: str = "https://guides.hackclub.app/index.php/Frequently_Asked_Questions"
 
-    first_ticket_create: str = """
+    first_ticket_create: str = f"""
 oh, hey (user) it looks like this is your first time here, welcome! someone should be along to help you soon, in the meantime please check out <{faq_link}|*the FAQ*>!
 if your question has been answered, please hit the button below to mark it as resolved
 """
