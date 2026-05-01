@@ -17,7 +17,7 @@ class Nest(Transcript):
 oh, hey (user) it looks like this is your first time here, welcome! someone should be along to help you soon, in the meantime please check out <{faq_link}|*the FAQ*>!
 if your question has been answered, please hit the button below to mark it as resolved
 """
-    ticket_create: str = "someone should be along to help you soon, in the meantime please check out <{faq_link}|*the FAQ*>!. once your question is resolved please hit the button below to mark it as resolved :D"
+    ticket_create: str = f"someone should be along to help you soon, in the meantime please check out <{faq_link}|*the FAQ*>!. once your question is resolved please hit the button below to mark it as resolved :D"
     ticket_resolve: str = f"oh, oh! it looks like this post has been marked as resolved by <@{{user_id}}>! if you have any more questions, please make a new post in <#{help_channel}> and someone'll be happy to help you out! not me though, i'm just a silly bird ^-^"
 
     not_allowed_channel: str = f"heya, it looks like you're not supposed to be in that channel, pls talk to <@{program_owner}> if that's wrong"
