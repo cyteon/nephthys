@@ -7,9 +7,11 @@ from piccolo.columns import OnUpdate
 from piccolo.columns import Serial
 from piccolo.columns import Text
 from piccolo.columns import Timestamptz
+from piccolo.columns import Varchar
 from piccolo.columns.defaults.timestamptz import TimestamptzNow
 from piccolo.table import Table
 
+from nephthys.database.enums import FeedbackRatingColumn
 from nephthys.database.enums import TicketStatus
 from nephthys.database.enums import TicketStatusColumn
 from nephthys.database.enums import UserType
@@ -23,10 +25,11 @@ def table_ref(table: str) -> LazyTableReference:
 
 class User(Table, tablename="User"):
     id = Serial(primary_key=True, unique=True)
-    slack_id = Text(db_column_name="slackId")
+    slack_id = Text(db_column_name="slackId", unique=True)
     username = Text(null=True)
     admin = Boolean(default=False)
     helper = Boolean(default=False)
+    app_home_last_view = Text(null=True, db_column_name="appHomeLastView")
 
     team_tag_subscriptions = M2M(table_ref("UserTagSubscription"))
 
@@ -159,6 +162,21 @@ class UserTagSubscription(Table, tablename="user_tag_subscriptions"):
     subscribed_at = Timestamptz(default=TimestamptzNow(), db_column_name="subscribedAt")
 
 
+class Feedback(Table, tablename="Feedback"):
+    id = Serial(primary_key=True, unique=True)
+    ticket = ForeignKey(
+        references=Ticket,
+        db_column_name="ticketId",
+    )
+    created_by = ForeignKey(
+        references=User,
+        db_column_name="createdById",
+    )
+    rating = FeedbackRatingColumn()
+    text = Varchar(null=True, length=32000)
+    created_at = Timestamptz(default=TimestamptzNow(), db_column_name="createdAt")
+
+
 # All tables must be listed here so that piccolo_app.py can find them.
 # This list is used for generating auto migrations.
 ALL_TABLES = [
@@ -170,4 +188,5 @@ ALL_TABLES = [
     BotMessage,
     TagsOnTickets,
     UserTagSubscription,
+    Feedback,
 ]

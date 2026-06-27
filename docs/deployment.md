@@ -38,9 +38,8 @@ Note: These steps have to be done by a Workspace Admin (otherwise it will be una
 2. Create New App > From a manifest
 3. Select YAML. Paste the [manifest.yml](../manifest.yml) file (but don't submit it yet)
 4. Update the `https://nephthys.hackclub.com/` URLs in the manifest to match the bot's domain (see above), and update the `name`, `description`, and bot user's `display_name`.
-5. Important: **Change the name of the `/dm-magic-link` command!** Or remove it entirely if it's not relevant
-6. Review the app's permissions and authorise it
-7. Click **OAuth & Permissions** in the sidebar, and hit **Install to Hack Club**
+5. Review the app's permissions and authorise it
+6. Click **OAuth & Permissions** in the sidebar, and hit **Install to Hack Club**
 
 ## Setting environment variables
 
@@ -63,8 +62,6 @@ Note: These steps have to be done by a Workspace Admin (otherwise it will be una
    SLACK_TICKET_CHANNEL="C..."
    SLACK_BTS_CHANNEL="C..."
    SLACK_HELP_CHANNEL="C..."
-   # Slack user group for the support team
-   SLACK_USER_GROUP="S..."
    # Copy this from the PostgreSQL resource you created earlier
    DATABASE_URL="postgres://postgres:blahblah@somewhere:5432/postgres"
    # Pick a transcript from the transcripts/ folder (your event will probably have its own)
@@ -73,11 +70,9 @@ Note: These steps have to be done by a Workspace Admin (otherwise it will be una
    APP_TITLE="Heidi the Assistant"
    # Hack Club AI API key for generating ticket titles (highly recommended)
    HACK_CLUB_AI_API_KEY="sk-hc-v1-..."
-   # Set this to the URL where the site will be hosted
+   # Set this to the URL where the bot will be hosted
    BASE_URL="https://summer.nephthys.hackclub.com"
    ```
-
-   - `SITE_API_KEY` (and `SITE_URL`) are only used for generating magic links for Summer of Making, so they don't have to be included
 
 3. There's more optional environment variables that you can set, which I shall document here:
 
@@ -90,19 +85,23 @@ Note: These steps have to be done by a Workspace Admin (otherwise it will be una
    OTEL_EXPORTER_OTLP_LOGS_BASIC_AUTH="username:password"
    # You can change the OTel service name if you want, but you don't have to
    OTEL_SERVICE_NAME="nephthys"
-   # Setting this to any value disables daily summary messages (yes, this is counter-intuitive and will be changed soon)
-   DAILY_SUMMARY=""
+   # Set this to false to disable daily summary messages in the BTS channel
+   DAILY_SUMMARY=true
    # Set the log level (defaults to "WARNING" in production)
    LOG_LEVEL="WARNING"
    # Override the log level for console output
    LOG_LEVEL_STDERR="WARNING"
    # Override the log level for OpenTelemetry output
    LOG_LEVEL_OTEL="WARNING"
-   
+
+   # Allow the poster of a question to give feedback after their ticket is resolved
+   # Feedback is stored in the "Feedback" table. Disabled by default.
+   ENABLE_FEEDBACK=false
+
    # Optional: Enable stale ticket auto-close
    # Tickets inactive for this many days will be automatically closed
    # Leave unset to disable
-   STALE_TICKET_DAYS="7"
+   STALE_TICKET_DAYS="" # e.g. 7
    ```
 
 4. Don't forget to click **Save All Environment Variables**

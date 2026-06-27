@@ -2,6 +2,7 @@ from typing import List
 from typing import Type
 
 from nephthys.transcripts.transcript import Transcript
+from nephthys.transcripts.transcripts.alchemize import Alchemize
 from nephthys.transcripts.transcripts.beest import Beest
 from nephthys.transcripts.transcripts.construct import Construct
 from nephthys.transcripts.transcripts.fallout import Fallout
@@ -13,6 +14,9 @@ from nephthys.transcripts.transcripts.jumpstart import Jumpstart
 from nephthys.transcripts.transcripts.lynx import Lynx
 from nephthys.transcripts.transcripts.midnight import Midnight
 from nephthys.transcripts.transcripts.nest import Nest
+from nephthys.transcripts.transcripts.outpost import Outpost
+from nephthys.transcripts.transcripts.stardance import Stardance
+from nephthys.transcripts.transcripts.stardance_ambassadors import StardanceAmbassadors
 from nephthys.transcripts.transcripts.stasis import Stasis
 from nephthys.transcripts.transcripts.summer_of_making import SummerOfMaking
 
@@ -30,4 +34,8 @@ transcripts: List[Type[Transcript]] = [
     Nest,
     Help,
     Beest,
+    StardanceAmbassadors,
+    Stardance,
+    Alchemize,
+    Outpost,
 ]

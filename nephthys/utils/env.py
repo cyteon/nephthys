@@ -13,6 +13,18 @@ from nephthys.transcripts.transcript import Transcript
 load_dotenv(override=True)
 
 
+def get_environ_bool(name: str, default: bool) -> bool:
+    value = os.environ.get(name, None)
+    if value is None:
+        return default
+    value = value.strip().lower()
+    if value in {"1", "true", "t", "yes", "y", "on"}:
+        return True
+    if value in {"0", "false", "f", "no", "n", "off"}:
+        return False
+    raise ValueError(f"Invalid boolean env var {name}={value!r}")
+
+
 class Environment:
     def __init__(self):
         self.slack_bot_token = os.environ.get("SLACK_BOT_TOKEN", "unset")
@@ -22,13 +34,6 @@ class Environment:
 
         self.uptime_url = os.environ.get("UPTIME_URL")
         self.hack_club_ai_api_key = os.environ.get("HACK_CLUB_AI_API_KEY")
-
-        self.site_url = os.environ.get("SITE_URL")
-        self.site_api_key = os.environ.get("SITE_API_KEY")
-        if self.site_url and not self.site_api_key:
-            raise ValueError(
-                "SITE_API_KEY must be set if SITE_URL is set to generate magic links"
-            )
 
         self.otel_logs_url = os.environ.get("OTEL_EXPORTER_OTLP_LOGS_ENDPOINT")
         self.otel_service_name = os.environ.get("OTEL_SERVICE_NAME", "nephthys")
@@ -52,10 +57,10 @@ class Environment:
         self.slack_help_channel = os.environ.get("SLACK_HELP_CHANNEL", "unset")
         self.slack_ticket_channel = os.environ.get("SLACK_TICKET_CHANNEL", "unset")
         self.slack_bts_channel = os.environ.get("SLACK_BTS_CHANNEL", "unset")
-        self.slack_user_group = os.environ.get("SLACK_USER_GROUP", "unset")
         self.slack_maintainer_id = os.environ.get("SLACK_MAINTAINER_ID", "unset")
         self.program = os.environ.get("PROGRAM", "summer_of_making")
-        self.daily_summary = True if not os.environ.get("DAILY_SUMMARY") else False
+        self.daily_summary = get_environ_bool("DAILY_SUMMARY", default=True)
+        self.enable_feedback = get_environ_bool("ENABLE_FEEDBACK", default=False)
         self.app_title = os.environ.get("APP_TITLE", "helper heidi")
 
         self.port = int(os.environ.get("PORT", 3000))

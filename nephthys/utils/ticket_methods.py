@@ -1,11 +1,19 @@
 import logging
 
+from blockkit.core import MessageBlock
 from slack_sdk.errors import SlackApiError
 from slack_sdk.web.async_client import AsyncWebClient
 
 from nephthys.database.tables import BotMessage
 from nephthys.database.tables import Ticket
 from nephthys.utils.env import env
+
+
+class ThreadGoneError(Exception):
+    """Raise when we try to end a message to that thread, but the thread no longer exists
+
+    This can happen when the top-level message is deleted.
+    """
 
 
 async def delete_message(channel_id: str, message_ts: str):
@@ -20,19 +28,33 @@ async def delete_message(channel_id: str, message_ts: str):
         )
 
 
-async def reply_to_ticket(ticket: Ticket, client: AsyncWebClient, text: str) -> None:
+async def reply_to_ticket(
+    ticket: Ticket,
+    client: AsyncWebClient,
+    text: str,
+    blocks: list[MessageBlock] | None = None,
+) -> None:
     """Sends a user-facing message in the help thread and records it in the database"""
     channel = env.slack_help_channel
     thread_ts = ticket.msg_ts
-    msg = await client.chat_postMessage(
+    response = await client.chat_postMessage(
         channel=channel,
         text=text,
         thread_ts=thread_ts,
+        blocks=[block.build() for block in blocks] if blocks else None,
     )
-    msg_ts = msg["ts"]
+    msg: dict = response["message"]  # type: ignore (assuming message exists)
+    msg_ts = msg.get("ts")
+    msg_thread_ts = msg.get("thread_ts")
     if not msg_ts:
-        logging.error(f"Bot message has no ts: {msg}")
-        return
+        raise ValueError(f"Bot message has no ts: {msg}")
+    if not msg_thread_ts:
+        # The thread probably got deleted while we were processing the event
+        logging.warning(
+            f"Reply to ticket was sent outside of thread. Attempted to send to thread_ts={thread_ts} for ticket_id={ticket.id}. Unsending."
+        )
+        await client.chat_delete(channel=channel, ts=msg_ts)
+        raise ThreadGoneError()
     bot_msg = BotMessage(ts=msg_ts, channel_id=channel, ticket=ticket.id)
     await bot_msg.save()
 
